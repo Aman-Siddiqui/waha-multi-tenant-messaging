@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+
+  db:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: waham
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"   # host:container (so you can still connect from host on 5433 if needed)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  waha:
+    image: devlikeapro/waha   # free core image (only 'default' session supported)
+    restart: unless-stopped
+    environment:
+      WHATSAPP_API_KEY: ${WAHA_API_KEY:-testkey}
+      WHATSAPP_API_WEBHOOK_SECRET: ${WAHA_WEBHOOK_SECRET:-testwebhook}
+      
+    ports:
+      - "9998:3000"
+
+    # depends on DB only if you want WAHA to talk to DB; keeps simple:
+    depends_on:
+      - db
+
+  api:
+    build: .
+    restart: unless-stopped
+
+    env_file:
+      - .env.docker
+
+    
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - waha
+    volumes:
+      - .:/usr/src/app   # useful for dev; remove in prod
+    command: npm run start:dev   # use dev server inside container (change to start:prod for prod)
+    # if you prefer production run, set command to ["npm","run","start:prod"]
+
+volumes:
+  db-data:
