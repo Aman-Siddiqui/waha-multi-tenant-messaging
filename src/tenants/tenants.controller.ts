@@ -21,7 +21,7 @@ export class TenantsController {
   }
 
   @Get(':id')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.MANAGER, UserRole.AUDITOR)
+  @Roles(UserRole.PLATFORM_ADMIN,UserRole.TENANT_ADMIN, UserRole.MANAGER, UserRole.AUDITOR)
   async getOne(@Param('id') id: string) {
     return this.svc.findOne(id);
   }

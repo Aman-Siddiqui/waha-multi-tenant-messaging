@@ -8,7 +8,7 @@ export class TenantMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
-    if (!authHeader) return next(); 
+    if (!authHeader) return next();
 
     const token = authHeader.split(' ')[1];
     if (!token) throw new UnauthorizedException('Missing token');
@@ -17,11 +17,19 @@ export class TenantMiddleware implements NestMiddleware {
       const payload: any = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
-      
+     console.log("from middleware", payload);
       (req as any).user = payload;
-      (req as any).tenantId = payload.tenant_id;
+
+      // ✅ Allow PLATFORM_ADMIN even without tenant_id
+      if (payload.role === 'PLATFORM_ADMIN') {
+        (req as any).tenantId = null;
+      } else if (payload.tenant_id) {
+        (req as any).tenantId = payload.tenant_id;
+      } else {
+        throw new UnauthorizedException('Missing tenant context');
+      }
     } catch (err) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Invalid or expired token');
     }
 
     next();

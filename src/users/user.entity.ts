@@ -23,9 +23,9 @@ import {
     @PrimaryGeneratedColumn('uuid')
     id: string;
   
-    @Column()
-    tenant_id: string;
-  
+    @Column({ nullable: true })
+    tenant_id: string | null;
+
     @ManyToOne(() => Tenant, (tenant) => tenant.users, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'tenant_id' })
     tenant: Tenant;

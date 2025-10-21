@@ -29,7 +29,8 @@ export class UsersController {
 
   @Get('me')
   async getProfile(@Req() req: any) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
+    console.log('Fetching profile for user ID:', req.user);
     return this.usersService.findProfile(userId);
   }
 }
