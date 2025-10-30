@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Message, MessageDirection } from './message.entity';
 import { WahaService } from '../waha/waha.service';
 import { WahaSession } from '../waha/waha-session.entity';
+import { ConversationsService } from 'src/conversations/conversations.service';
+
 
 @Injectable()
 export class MessagesService {
@@ -15,6 +17,7 @@ export class MessagesService {
     @InjectRepository(WahaSession)
     private readonly sessionRepo: Repository<WahaSession>,
     private readonly wahaService: WahaService,
+    private readonly conversationsService: ConversationsService,
   ) {}
 
   async sendMessage(
@@ -45,6 +48,8 @@ export class MessagesService {
       text,
       raw_json: {},
     });
+    const conv = await this.conversationsService.findOrCreateByPhone(tenantId, phone);
+msg.conversation_id = conv.id;
     await this.messageRepo.save(msg);
 
     try {

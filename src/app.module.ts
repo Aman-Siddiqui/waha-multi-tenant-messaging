@@ -11,12 +11,14 @@ import { MessagesModule } from './messages/messages.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { HealthModule } from './health/health.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
-
+import { ConversationsModule } from './conversations/conversations.module';
 
 import { Tenant } from './tenants/tenant.entity';
 import { User } from './users/user.entity';
 import { WahaSession } from './waha/waha-session.entity';
 import { Message } from './messages/message.entity';
+import { Conversation } from './conversations/conversation.entity';
+
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import { Message } from './messages/message.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Tenant, User, WahaSession, Message],
+      entities: [Tenant, User, WahaSession, Message, Conversation],
       synchronize: false,
     }),
 
@@ -45,6 +47,7 @@ import { Message } from './messages/message.entity';
     MessagesModule,
     WebhooksModule,
     HealthModule,
+    ConversationsModule
   ],
 })
 export class AppModule implements NestModule {

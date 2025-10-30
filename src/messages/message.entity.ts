@@ -9,6 +9,8 @@ import {
   import { Tenant } from '../tenants/tenant.entity';
   import { WahaSession } from '../waha/waha-session.entity';
   import { ApiProperty } from '@nestjs/swagger';
+  import { Conversation } from '../conversations/conversation.entity';
+
   
   export enum MessageDirection {
     IN = 'IN',
@@ -56,5 +58,13 @@ import {
     @ApiProperty({ example: '2025-10-08T10:12:00.000Z' })
     @CreateDateColumn()
     created_at!: Date;
+
+      @Column({ nullable: true })
+  conversation_id?: string;
+
+  @ManyToOne(() => Conversation, (c) => c.messages, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'conversation_id' })
+  conversation?: Conversation;
+
   }
   
